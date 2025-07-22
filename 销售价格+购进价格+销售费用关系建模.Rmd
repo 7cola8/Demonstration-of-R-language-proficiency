@@ -1,0 +1,44 @@
+---
+title: "大型商场"
+author: "DL"
+date: "2025-03-30"
+output: html_document
+---
+
+```{r setup, include=TRUE}
+
+knitr::opts_chunk$set(echo = TRUE, results = "markup")
+
+# 构造数据
+data <- data.frame(
+  编号 = 1:15,
+  y = c(1238,1266,1200,1193,1106,1303,1313,1144,1286,1084,1120,1156,1205,1263,1246),
+  x1 = c(966,894,440,664,791,852,905,905,771,511,505,851,659,490,696),
+  x2 = c(223,257,387,316,339,283,302,214,304,326,339,235,276,490,316)
+)
+
+head(data)
+
+cor_y_x1 <- cor(data$y, data$x1)
+cor_y_x2 <- cor(data$y, data$x2)
+
+cor_y_x1  # 中等相关：销售价格 vs 购进价格
+cor_y_x2  # 弱相关：销售价格 vs 销售费用
+
+model <- lm(y ~ x1 + x2, data = data)
+summary(model)
+#根据检验结果，p>=0.05，变量不显著，可考虑剔除
+
+summary(model)$r.squared
+#R2越接近1，模型解释能力越强
+#计算所得R2=0.35，所得结论与问题二相一致，都为不显著
+
+cor_x1_x2 <- cor(data$x1, data$x2)
+cor_x1_x2
+#可判断得，购进价格与销售费用之间存在强相关关系，同时为负相关
+
+library(car)
+vif(model)
+#若某变量VIF>10，可判断存在严重共线性
+#由计算结果可得，相关性较弱，可忽略共线性
+#建议：可加入标准化，逐步回归等方法进一步优化模型
